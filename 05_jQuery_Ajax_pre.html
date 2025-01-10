@@ -5,77 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jQuery Ajax pre (picSum)</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <style>
-    #imageContainer, #catContainer{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .image-item {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      border: 1px solid #ddd;
-    }
-  </style>
+    <style>
+        #imageContainer, #catContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .image-item {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-  <h1>AJAX로 이미지 가져오기</h1>
+<h1>AJAX로 이미지 가져오기</h1>
 <button id="loadImages">강아지 사진 가져오기</button>
 <div id="imageContainer"></div>
 <script>
-  $('#loadImages').click(function (){
-    $.ajax({
-      // 무료 강아지 사진 이미지 제공 search?limit = 1 랜덤으로 1장만 검색한다.
-      url: 'https://api.thedogapi.com/v1/images/search?limit=1',
-      method:'GET',
-      success:
-        function (data) {
-        // 이미지가 한장만 보였으면 할 때
-          // 1. .append() -> .html()로 변경한다
-          // 2. .empty() 비우기를 사용한다
-          $('#imageContainer').empty(); //이전 이미지 제거하기
-          $('#imageContainer').append(
-                  /*
-                    TheDogApi는 한 번의 요청으로 여러 이미지를 가져올 수 있도록 설계
-                                기본적으로 배열을 반환하도록 설정
-                                이미지 한장
-                                                  index = 0번째
-                                String arr[] = [이미지주소];
-                    data[0].url;
+    $('#loadImages').click(function () {
+        $.ajax({
+            // 무료 강아지 사진 이미지 제공 search?limit = 1 랜덤으로 1장만 검색한다.
+            url: 'https://api.thedogapi.com/v1/images/search?limit=1',
+            method: 'GET',
+            success:
+                function (data) {
+                    // 이미지가 한장만 보였으면 할 때
+                    // 1. .append() -> .html()로 변경한다
+                    // 2. .empty() 비우기를 사용한다
+                    $('#imageContainer').empty(); //이전 이미지 제거하기
+                    $('#imageContainer').append(
+                        /*
+                          TheDogApi는 한 번의 요청으로 여러 이미지를 가져올 수 있도록 설계
+                                      기본적으로 배열을 반환하도록 설정
+                                      이미지 한장
+                                                        index = 0번째
+                                      String arr[] = [이미지주소];
+                          data[0].url;
 
-                  */
-                  //1장만 가져오기 때문에 첫번째로 보이는 사진을 가지고 오겠다 설정
-                  '<img class="image-item" src='+data[0].url+ '>'
-          );
-        },
-      error:
-        function (){
-            $('#imageContainer').html('<p>강아지 사진을 가져오는데 실패했습니다.</p>');
-        }
+                        */
+                        //1장만 가져오기 때문에 첫번째로 보이는 사진을 가지고 오겠다 설정
+                        '<img class="image-item" src=' + data[0].url + '>'
+                    );
+                },
+            error:
+                function () {
+                    $('#imageContainer').html('<p>강아지 사진을 가져오는데 실패했습니다.</p>');
+                }
+        })
     })
-  })
 </script>
 <div id="catContainer"></div>
 <button id="loadCat">고양이 사진 가져오기</button>
 <script>
-  $('#loadCat').click(function (){
-    $.ajax({
-      url: 'https://api.thecatapi.com/v1/images/search?limit=1',
-      method: 'GET',
-      success:
-        function (data){
-          $('#catContainer').append(
-                  '<img class="image-item" src = '+data[0].url+ '>'
-          );
-        },
-      error:
-        function (){
-          $('#catContainer').html('<h3>고양이 사진 로딩 실패</h3>');
-        }
-    })
-  })
+    $(document).ready(
+        $('#loadCat').click(function () {
+            $.ajax({
+                url: 'https://api.thecatapi.com/v1/images/search?limit=1',
+                method: 'GET',
+                success: //back-end나 api에서 데이터를 성공적으로 가져온 경우
+                    function (data) {
+                        $('#catContainer').empty(); //기존에 존재하는 고양이사진 지우기
+                        if(data.length >0) { //가져온 데이터가 1개 이상
+                            const catUrl = data[0].url;
+                            $('#catContainer').append(
+                                '<img class="image-item" src = ' + catUrl + '>'
+                            );
+                        }else{ //존재하는 데이터가 0개인 경우
+                            //$('catContainer').html('<p>조회된 고양이 사진이 0장입니다.</p>');
+                            //$('catContainer').html('<p>조회된 고양이 사진이'+data.lenth+'장입니다.</p>');
+                            $('catContainer').html(`<p>조회된 고양이 사진이 ${data.lenth} 장입니다.</p>`);
+                        }
+                    },
+                error: //back-end에서 데이터를 가져오지 못하는 경우
+                    function () {
+                        $('#catContainer').html('<h3>고양이 사진 로딩 실패</h3>');
+                    }
+            });
+        })
+    );
 </script>
 </body>
 </html>
