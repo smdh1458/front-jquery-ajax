@@ -82,30 +82,40 @@
     <div class="error" id="error"></div>
 </div>
 <script>
-    const cityRegex = /^[가-힣a-zA-Z\s]{2,30}$/;
-    $('#getWeather').click(function () {
-        const city = document.getElementById("cityInput").value.trim();
-        console.log(city);
-        const apiweather = `https://goweather.herokuapp.com/weather/${city}`;
+    $(document).ready(function (){
+        $("#getWeather").click(function (){
+            const city = $("#cityInput").value.trim(); //trim() = 양쪽 공백 제거
+
+            //input에 아무글자도 적혀있지 않을 때
+            if(city === ""){
+                $("#error").text("도시 이름을 입력하세요");
+                $("#weatherResult").text("");
+                return;
+            }
+
+            $("#error").text("");
+            $("#weatherResult").text("날씨정보 가져오는 중");
+
         $.ajax({
-            url: apiweather,
-            method: 'GET',
+            url:`https://goweather.herokuapp.com/weather/${city}`,
+            method:"GET",
             success:
                 function (data) {
-                    if (cityRegex.test(city)) {
-                        $('#weatherResult').html('<p>온도: ' + data.temperature + '</p>' + '<p>바람: ' + data.wind + '</p>'
-                            + '<p>날씨 설명: ' + data.description + '</p>');
+                    if (data.temperature){
+                        $("#weatherResult").html(`<p>온도: ${data.temperature}</p><p>바람: ${data.wind}</p><p>습도: ${data.description}</p>`);
                     }else {
-                        $('#weatherResult').html('<p>유효한 도시 이름을 입력해주세요</p>');
+                        $("#error").text("유효안 도시 이름을 입력해주세요");
+                        $("#weatherResult").text("");
                     }
+
                 },
             error:
-                function () {
-                    $('#error').html('<p>날씨 정보를 가져오는데 실패했습니다. 다시 시도해주세요</p>');
+                function (){
+                    $("#error").text("날씨 정보를 가져오는데 실패했습니다. 다시 시도해주세요.");
                 }
         })
+        });
     })
-
 </script>
 </body>
 </html>

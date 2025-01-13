@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>08_jQuery Ajax people</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #4267b2;
+            color: white;
+            padding: 1em;
+            width: 100%;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .profile-container {
+            margin: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .profile-container img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-container h2 {
+            margin: 15px 0 5px;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        .profile-container p {
+            font-size: 1em;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .profile-container button {
+            background-color: #4267b2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-container button:hover {
+            background-color: #365899;
+        }
+    </style>
+</head>
+<body>
+    <header>유저 프로필 조회</header>
+    <div class="profile-container">
+        <img id="profilePic" src="" alt="프로필 사진">
+        <h2 id="profileName">이름</h2>
+        <p id="profileEmail">이메일</p>
+        <p id="profileLocation">위치</p>
+        <button id="loadProfile">새로운 프로필 보기</button>
+    </div>
+<script>
+    function functionProfile(){
+        $.ajax({
+            url:"https://randomuser.me/api/",
+            method:"GET",
+            success:
+                function (data){
+                    const user = data.result[0];//유저 사진 맨 앞에 1장만 선택
+                    console.log("USER 정보: "+user);
+                    //profilePic   picture.large
+                    $("#profilePic").attr("src",user.picture.large);
+
+                    //profileName  name.firstname.last
+                    $("#profileName").text(`${user.name.first} ${user.name.last}`);
+
+                    //profileEmail email
+                    $("#profileEmail").text(user.email);
+
+                    //profileLocation   location.city   location.country
+                    $("#profileLocation").text(user.location.city, user.location.country,
+                    user.location.street.number);
+
+
+                },
+            error:
+                function (){
+                    alert("프로필 데이터를 불러오는데 실패했습니다. 다음에 다시 시도해주세요.");
+                }
+
+        });
+    }
+    //초기 프로필 불러오기
+    functionProfile();
+
+    $("#loadProfile").click(function () {
+        functionProfile();
+    })
+    //버튼  클릭시 새로운 프로필 불러오기
+
+    /*
+    // 20250113113547
+    // https://randomuser.me/api/ 내부에 들어있는 json 데이터
+
+    { = data 명칭으로 제일 먼저 시작하는 중괄호를 가리키고 있음
+    data 중괄호 내부에 존재하는 results = 결과들 중에서 [] = 대괄호 배열, 리스트 표기방식으로 되어있는 유저결과들 중에서
+    data.result[0] = 제일 첫번째로 나와있는 유저정보를 가져오기
+
+    유저 정보데이터 결과들 중에서 제일 첫번째로 나와있는 값의 성별을 가져오고 싶다.
+    data.results[0].gender = 성별 데이터 가리킴
+    data.results[0].name.title = Mr 데이터 가리킴
+    data.results[0].name.first = Araci 데이터 가리킴
+    data.results[0].location.city = Rio Verde 데이터 가리킴
+      "results": [
+        {
+          "gender": "female",
+          "name": {
+            "title": "Miss",
+            "first": "Araci",
+            "last": "Martins"
+          },
+          "location": {
+            "street": {
+              "number": 3168,
+              "name": "Rua Mato Grosso "
+            },
+            "city": "Rio Verde",
+            "state": "Goiás",
+            "country": "Brazil",
+            "postcode": 81979,
+            "coordinates": {
+              "latitude": "-74.1685",
+              "longitude": "33.8780"
+            },
+            "timezone": {
+              "offset": "-5:00",
+              "description": "Eastern Time (US & Canada), Bogota, Lima"
+            }
+          },
+          "email": "araci.martins@example.com",
+          "login": {
+            "uuid": "182456c4-cb17-4e24-969e-694b7b8c736c",
+            "username": "tinygorilla632",
+            "password": "murphy",
+            "salt": "UhD5jpgA",
+            "md5": "990c815d49206465cc9e27be242b66bd",
+            "sha1": "177bc201bfa679489ce87616f068c23e16b3d25f",
+            "sha256": "0ab2b49726226b49d95e9a5bf072dc93fc1653fa143886fc8ff60a1f322c70db"
+          },
+          "dob": {
+            "date": "1961-10-30T07:53:23.226Z",
+            "age": 63
+          },
+          "registered": {
+            "date": "2016-11-27T19:43:15.031Z",
+            "age": 8
+          },
+          "phone": "(75) 7424-7918",
+          "cell": "(91) 6184-1318",
+          "id": {
+            "name": "CPF",
+            "value": "831.648.424-00"
+          },
+          "picture": {
+            "large": "https://randomuser.me/api/portraits/women/42.jpg",
+            "medium": "https://randomuser.me/api/portraits/med/women/42.jpg",
+            "thumbnail": "https://randomuser.me/api/portraits/thumb/women/42.jpg"
+          },
+          "nat": "BR"
+        }
+      ],
+      "info": {
+        "seed": "1bab435601c8d9a6",
+        "results": 1,
+        "page": 1,
+        "version": "1.4"
+      }
+    }
+    */
+</script>
+</body>
+</html>
