@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>08_jQuery Ajax people</title>
+    <title>08_jQuery Ajax people many</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
         body {
@@ -74,6 +74,10 @@
 </head>
 <body>
 <header>유저 프로필 조회</header>
+<div class="profile-container" id="profilesContainer">
+</div>
+<button id="loadProfile">새로운 친구 찾기</button>
+<!--
 <div class="profile-container">
     <img alt="프로필 사진" id="profilePic" src="">
     <h2 id="profileName">이름</h2>
@@ -81,26 +85,28 @@
     <p id="profileLocation">위치</p>
     <button id="loadProfile">새로운 프로필 보기</button>
 </div>
+-->
 <script>
     function functionProfile() {
         $.ajax({
-            url: "https://randomuser.me/api/",
+            url: "https://randomuser.me/api/?results=5",
             method: "GET",
             success:
                 function (data) {
-                    const user = data.results[0];// 유저 사진 맨 앞에 1장만 선택
-
-                    // profilePic   picture.large
-                    $("#profilePic").attr("src", user.picture.large);
-
-                    // profileName   name.first name.last
-                    $("#profileName").text(`${user.name.first}, ${user.name.last}`);
-
-                    // profileEmail email
-                    $("#profileEmail").text(user.email);
-
-                    // profileLocation   location.city   location.country
-                    $("#profileLocation").text(user.location.city, user.location.country);
+                $("#profilesContainer").html("");
+                   $.each(data.results, function (index,value){
+                       //$("#profilesContainer").html("");
+                       //each 내부에 <div class="profilesContainer" id="profilesContainer">이미지가 표시되는
+                       //div를 .html("")초기화 하는 작업을 진행하게 되면 반복문을 돌아갈 때마다 기존에 존재하는
+                       //데이터를 지우는 행위 마지막에 최종적으로 1개의 데이터만 보여짐
+                        $("#profilesContainer").append(`<div class = "profile-container">
+                               <img src="${value.picture.large}">
+                               <h2>${value.name.first} ${value.name.last}</h2>
+                               <p>이메일: ${value.email}</p>
+                               <p>위치: ${value.location.city}, ${value.location.country}</p>
+                               <p>아이디: ${value.login.uuid}</p>
+                               </div>`)
+                    })
                 },
             error:
                 function () {
