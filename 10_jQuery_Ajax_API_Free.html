@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Ajax API Free</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="icon" href="favicon.ico">
+    <style>
+        body {
+            background-color: lightblue;
+            text-align: center;
+        }
+
+        #resultInfo {
+            margin: 10px 0;
+        }
+
+        #getInfo {
+            width: 200px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid red;
+            background-color: lightcoral;
+            cursor: pointer;
+        }
+
+        #getInfo:hover {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<h2>랜덤으로 2023년 월별 상어 공격정보 가져오기</h2>
+<button id="getInfo">랜덤으로 가져오기</button>
+<h4 id="choiceMonth"></h4>
+<div id="resultInfo"></div>
+<script>
+    $("#getInfo").click(function () {
+        const randomId = Math.floor(Math.random() * 12) + 1;
+        console.log(randomId);
+        $.ajax({
+            url: `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/global-shark-attack/records?limit=20&refine=date:2023/${randomId}`,
+            method: "GET",
+            success:
+                function (data) {
+                    $("#choiceMonth").html(randomId + "월 달");
+                    if(data.total_count > 0){
+                        $("#resultInfo").html("");
+                        $.each(data.results, function (index, value) {
+                            let shark = value.species;
+                            console.log(shark);
+                            if (value.species === null){
+                                shark = "알 수 없음";
+                            }
+                            $("#resultInfo").append("날짜: " + value.date + "<br>" + "국가: " + value.country + "<br>" + "지역: " + value.area + "<br>" + "활동: " + value.activity +
+                                "<br>" + "상어 종류: " + shark + "<hr style='border-color: black'>");
+                        })
+                }else {
+                        $("#resultInfo").html(`
+                            <p>데이터가 없습니다.</p>
+                        `)
+                    }
+                },
+            error:
+                function () {
+                    alert("데이터 불러오기 실패");
+                }
+        })
+    })
+</script>
+</body>
+</html>

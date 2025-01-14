@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜덤 영화 평점 조회하기</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<header>랜덤 영화 평점 조회하기</header>
+<div class="main-container">
+    <div class="section" id="topMovies">
+        <h3>평점 높은 영화</h3>
+        <div class="movie-list" id="topRatedMovies">
+        </div>
+        <button id="randomButton">새로운 영화 보기</button>
+    </div>
+</div>
+<script>
+    const movies = ["Inception", "The Dark Knight", "Interstellar", "The Godfather", "Pulp Fiction", "The Shawshank Redemption", "Forrest Gump", "Gladiator", "The Matrix", "Avengers: Endgame"];
+    function loadMovies() {
+        const randomMovies = movies.sort(() => 0.5 - Math.random()).slice(0, 5);
+        const apiKey = "본인키";
+
+        $.each(randomMovies, function (input, value) {
+            const apiURL = `http://www.omdbapi.com/?t=${encodeURIComponent(value)}&apikey=${apiKey}`;
+            $.ajax({
+                url: apiURL,
+                method: "GET",
+                success:
+                    function (data) {
+                        $("#topRatedMovies").append(`
+                          <div class="topRatedMovies">
+                          <img src="${data.Poster}" alt="이미지 없음">
+                          <h4>제목: ${data.Title} (${data.Year})</h4>
+                          <p>평점: ${data.imdbRating}</p>
+                          <p>줄거리: ${data.Plot}</p>
+                     `)
+                    },
+                error:
+                    function () {
+                        alert("서버와 통신중 문제가 발생했습니다.");
+                    }
+            })
+        })
+    }
+
+    loadMovies();
+
+    $("#randomButton").click(function (){
+        $("#topRatedMovies").html("");
+        loadMovies();
+    })
+</script>
+</body>
+</html>
+
